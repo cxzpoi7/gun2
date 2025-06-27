@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>GUN</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a1a2e; /* Darker, richer background */
+            font-family: 'Press Start 2P', cursive; /* Pixel font for game feel */
+            background-image: url('background.PNG');
+            background-size: cover;
+            background-position: center;
+            color: #e0e0e0; /* Lighter text color */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        /* Import Google Font for pixelated look */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; /* Ensure nothing spills out */
+            border: 5px solid #4CAF50; /* Game border */
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.8); /* Green glow */
+        }
+        .entity {
+            position: absolute;
+            width: 160px; /* Doubled from 80px */
+            height: 160px; /* Doubled from 80px */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.1s ease-out; /* Smooth movement */
+        }
+        #player {
+            background-image: url('teki.png');
+            bottom: 140px; /* Adjusted for control area and new size */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #enemy {
+            background-image: url('mikata.PNG');
+            top: 100px; /* Doubled from 50px */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .bullet {
+            position: absolute;
+            width: 20px; /* Doubled from 10px */
+            height: 60px; /* Doubled from 30px */
+            background: linear-gradient(to bottom, #00ffff, #0077ff); /* Cool blue gradient */
+            border-radius: 10px; /* Adjusted for new size */
+            box-shadow: 0 0 20px #00ffff;
+            z-index: 10;
+            animation: bullet-glow 0.5s infinite alternate; /* Pulsing glow */
+        }
+        .enemy-bullet {
+            background: linear-gradient(to bottom, #ff0000, #cc0000); /* Red gradient */
+            box-shadow: 0 0 20px #ff0000;
+        }
+        /* Muzzle Flash Effect */
+        .muzzle-flash {
+            position: absolute;
+            width: 80px; /* Size of the flash */
+            height: 80px; /* Size of the flash */
+            background-color: rgba(255, 255, 0, 0.8); /* Yellowish flash */
+            border-radius: 50%; /* Circular flash */
+            box-shadow: 0 0 20px 10px rgba(255, 255, 0, 0.6); /* Glowing effect */
+            animation: fadeOut 0.1s forwards; /* Quick fade out */
+            z-index: 11; /* Above bullets */
+        }
+        /* Hit Effect */
+        .hit-effect {
+            position: absolute;
+            width: 50px; /* Size of the hit effect */
+            height: 50px; /* Size of the hit effect */
+            background-color: rgba(255, 0, 0, 0.7); /* Reddish hit */
+            border-radius: 50%; /* Circular hit */
+            box-shadow: 0 0 15px 5px rgba(255, 0, 0, 0.5); /* Glowing effect */
+            animation: expandAndFade 0.2s forwards; /* Expand and fade out */
+            z-index: 12; /* Above muzzle flash */
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        @keyframes expandAndFade {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        .obstacle {
+            position: absolute;
+            width: 200px; /* Doubled from 100px */
+            height: 300px; /* Doubled from 150px */
+            background-image: url('tree.PNG');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 5; /* Below bullets, above background */
+            border-radius: 50%; /* Make trees look more natural */
+            box-shadow: 0 0 15px rgba(0, 128, 0, 0.7); /* Green shadow for trees */
+        }
+        #health-bars {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            color: #e0e0e0;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            z-index: 100;
+        }
+        .health-bar-container {
+            width: 48%; /* Slightly adjusted for spacing */
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #555;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .health-bar {
+            width: 100%;
+            height: 25px; /* Slightly taller */
+            background-color: #333;
+            border: 1px solid #888;
+            margin-top: 8px;
+            border-radius: 5px;
+            overflow: hidden; /* Ensure fill stays within bounds */
+        }
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ff416c, #ff4b2b); /* Red-orange gradient for health */
+            width: 100%;
+            transition: width 0.3s ease-out;
+            border-radius: 5px;
+        }
+        #controls {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 120px; /* Doubled from 60px */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: linear-gradient(to top, #2c3e50, #4a6984); /* Dark blue gradient */
+            border-top: 3px solid #555;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+        .control-btn {
+            width: 160px; /* Doubled from 80px */
+            height: 80px; /* Doubled from 40px */
+            background: linear-gradient(to bottom, #6a82fb, #fc5c7d); /* Vibrant gradient */
+            color: white;
+            border: 3px solid #fff;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px; /* Doubled from 18px */
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        .control-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95); /* More opaque */
+            background-image: url('gameover.PNG');
+            background-size: 40%; /* Make it smaller */
+            background-repeat: no-repeat;
+            background-position: center 20%; /* Position image higher */
+            color: #ffcc00; /* Gold color for text */
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5em; /* Slightly larger */
+            text-align: center;
+            z-index: 250; /* Ensure it's above everything */
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+        }
+        #game-over-screen button {
+            margin-top: 20px;
+            padding: 18px 35px;
+            font-size: 0.6em;
+            cursor: pointer;
+            background: linear-gradient(to right, #4CAF50, #8BC34A); /* Green gradient */
+            border: none;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+        #game-over-screen button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+        }
+        #bgm-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 300; /* Ensure it's on top */
+        }
+        #bgm-toggle-btn {
+            width: 50px; /* Slightly larger */
+            height: 50px; /* Slightly larger */
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.7); /* Darker semi-transparent */
+            color: white;
+            font-size: 2em; /* Larger icon */
+            border: 3px solid #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); /* White glow */
+            transition: all 0.2s ease-in-out;
+        }
+        #bgm-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        #title-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            background-image: url('title.PNG'); /* Reverted to title.PNG */
+            background-size: cover;
+            background-position: center;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Reverted to center */
+            align-items: center;
+            font-size: 2.5em;
+            text-align: center;
+            z-index: 300;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            padding-top: 0; /* Remove padding */
+        }
+        #title-screen h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #ffcc00;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+        }
+        #title-screen p {
+            font-size: 0.7em;
+            margin-bottom: 40px;
+            max-width: 90%;
+            line-height: 1.5;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #555;
+        }
+        #title-screen button {
+            padding: 18px 35px;
+            font-size: 0.9em;
+            cursor: pointer;
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+        #title-screen button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+        }
+        #title-screen-icon {
+            width: 200px; /* Adjust size as needed */
+            height: 200px; /* Adjust size as needed */
+            background-image: url('title2.PNG');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-bottom: 30px; /* Space between icon and title */
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container" style="display: none;">
+    <!-- Health Bars -->
+    <div id="health-bars">
+        <div class="health-bar-container">
+            <span>PLAYER</span>
+            <div class="health-bar">
+                <div id="player-health-fill" class="health-fill"></div>
+            </div>
+        </div>
+        <div class="health-bar-container">
+            <span>ENEMY</span>
+            <div class="health-bar">
+                <div id="enemy-health-fill" class="health-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Entities -->
+    <div id="player" class="entity"></div>
+    <div id="enemy" class="entity"></div>
+
+    <!-- Obstacles -->
+    <div class="obstacle" style="left: 20%; top: 40%;"></div>
+    <div class="obstacle" style="left: 50%; top: 30%;"></div>
+    <div class="obstacle" style="left: 80%; top: 40%;"></div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen">
+        <div id="game-over-text"></div>
+        <button id="restart-btn">もう一度遊ぶ</button>
+        <button id="back-to-title-btn">タイトルに戻る</button>
+    </div>
+
+    <!-- BGM Control -->
+    <div id="bgm-control">
+        <button id="bgm-toggle-btn">♪</button>
+    </div>
+</div>
+
+<!-- Title Screen -->
+<div id="title-screen">
+    <div id="title-screen-icon"></div>
+    <h1>GUN GAME</h1>
+    <p>操作方法:<br>PC: ← → キーで移動、スペースキーで発砲<br>スマホ: 画面下のボタンで操作</p>
+    <button id="start-new-game-btn">はじめから</button>
+    <button id="continue-game-btn">途中から</button>
+</div>
+
+<audio id="game-bgm" src="bgm.mp3" loop></audio>
+<audio id="shoot-sound" src="shoot.mp3"></audio>
+<audio id="hit-sound" src="hit.mp3"></audio>
+
+<!-- Controls -->
+<div id="controls">
+    <div class="control-btn" id="left-btn">左</div>
+    <div class="control-btn" id="shoot-btn">撃つ</div>
+    <div class="control-btn" id="right-btn">右</div>
+</div>
+
+<script>
+    // Game elements
+    const gameContainer = document.getElementById('game-container');
+    const player = document.getElementById('player');
+    const enemy = document.getElementById('enemy');
+    const playerHealthFill = document.getElementById('player-health-fill');
+    const enemyHealthFill = document.getElementById('enemy-health-fill');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const gameOverText = document.getElementById('game-over-text');
+    const restartBtn = document.getElementById('restart-btn');
+    const gameBGM = document.getElementById('game-bgm');
+    const bgmToggleButton = document.getElementById('bgm-toggle-btn');
+    const shootSound = document.getElementById('shoot-sound');
+    const hitSound = document.getElementById('hit-sound');
+    const titleScreen = document.getElementById('title-screen');
+    const startNewGameBtn = document.getElementById('start-new-game-btn');
+    const continueGameBtn = document.getElementById('continue-game-btn');
+    const backToTitleBtn = document.getElementById('back-to-title-btn');
+
+    let isBgmPlaying = false;
+
+    // Controls
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+    const shootBtn = document.getElementById('shoot-btn');
+
+    // Game state
+    let playerHealth = 100;
+    let enemyHealth = 100;
+    let playerX = window.innerWidth / 2;
+    let enemyX = window.innerWidth / 2;
+    const playerSpeed = 8;
+    const enemySpeed = 4;
+    let enemyDirection = 1; // 1 for right, -1 for left
+    const bulletSpeed = 10;
+    let playerBullets = [];
+    let enemyBullets = [];
+    let obstacles = [];
+    let gameActive = true;
+
+    // Control state
+    let moveLeft = false;
+    let moveRight = false;
+
+    const BULLET_WIDTH = 20;
+    const BULLET_HEIGHT = 60;
+
+    // --- Game Setup ---
+    function initGame() {
+        // Hide game elements, show title screen
+        gameContainer.style.display = 'none';
+        titleScreen.style.display = 'flex';
+        gameOverScreen.style.display = 'none';
+
+        // Check for saved game data
+        if (localStorage.getItem('gunGameSave')) {
+            continueGameBtn.style.display = 'block';
+        } else {
+            continueGameBtn.style.display = 'none';
+        }
+
+        // Ensure BGM is paused and reset
+        gameBGM.pause();
+        gameBGM.currentTime = 0;
+        gameBGM.muted = true;
+        bgmToggleButton.textContent = '♪';
+        isBgmPlaying = false;
+    }
+
+    function startGame(loadSavedGame = false) {
+        gameActive = true;
+        playerBullets.forEach(b => b.element.remove());
+        enemyBullets.forEach(b => b.element.remove());
+        playerBullets = [];
+        enemyBullets = [];
+        
+        // Clear existing obstacles and create new ones
+        obstacles.forEach(o => o.remove());
+        obstacles = [];
+        createObstacles();
+
+        if (loadSavedGame) {
+            loadGame();
+        } else {
+            playerHealth = 100;
+            enemyHealth = 100;
+            playerX = window.innerWidth * 0.25; // Player starts on the left side
+            enemyX = window.innerWidth * 0.75; // Enemy starts on the right side
+        }
+        
+        updateHealthBars();
+        gameOverScreen.style.display = 'none';
+        titleScreen.style.display = 'none';
+        gameContainer.style.display = 'block';
+        
+        // Reset positions
+        player.style.left = `${playerX - player.offsetWidth / 2}px`;
+        enemy.style.left = `${enemyX - enemy.offsetWidth / 2}px`;
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function createObstacles() {
+        const obstaclePositions = [
+            { left: 20, top: 40 },
+            { left: 50, top: 30 },
+            { left: 80, top: 40 }
+        ];
+
+        obstaclePositions.forEach(pos => {
+            const obstacle = document.createElement('div');
+            obstacle.className = 'obstacle';
+            obstacle.style.left = `${pos.left}%`;
+            obstacle.style.top = `${pos.top}%`;
+            gameContainer.appendChild(obstacle);
+            obstacles.push(obstacle);
+        });
+    }
+
+    // --- Save/Load Game ---
+    function saveGame() {
+        const gameState = {
+            playerHealth: playerHealth,
+            enemyHealth: enemyHealth,
+            playerX: playerX,
+            enemyX: enemyX
+        };
+        localStorage.setItem('gunGameSave', JSON.stringify(gameState));
+        console.log("Game saved!");
+    }
+
+    function loadGame() {
+        const savedState = localStorage.getItem('gunGameSave');
+        if (savedState) {
+            const gameState = JSON.parse(savedState);
+            playerHealth = gameState.playerHealth;
+            enemyHealth = gameState.enemyHealth;
+            playerX = gameState.playerX;
+            enemyX = gameState.enemyX;
+            console.log("Game loaded!");
+        } else {
+            console.log("No saved game found.");
+            // If no save, start a new game
+            startGame(false);
+        }
+    }
+
+    // --- Health and UI ---
+    function updateHealthBars() {
+        playerHealthFill.style.width = `${playerHealth}%`;
+        enemyHealthFill.style.width = `${enemyHealth}%`;
+    }
+
+    function showGameOver(message) {
+        gameActive = false;
+        gameOverText.textContent = message;
+        gameOverScreen.style.display = 'flex';
+        saveGame(); // Save game state on game over
+        // Remove all obstacles
+        obstacles.forEach(o => o.remove());
+        obstacles = [];
+    }
+
+    // --- Bullet Handling ---
+    function createBullet(xCenter, yTop, isPlayer) {
+        const bullet = document.createElement('div');
+        bullet.className = 'bullet';
+        // Set bullet's top-left position based on its center and dimensions
+        bullet.style.left = `${xCenter - (BULLET_WIDTH / 2)}px`;
+        bullet.style.top = `${yTop}px`;
+        if (!isPlayer) {
+            bullet.classList.add('enemy-bullet');
+        }
+        gameContainer.appendChild(bullet);
+        return { element: bullet, x: xCenter - (BULLET_WIDTH / 2), y: yTop };
+    }
+
+    function playerShoot() {
+        if (!gameActive) return;
+        const playerRect = player.getBoundingClientRect();
+        const bulletXCenter = playerRect.left + playerRect.width / 2; // Player's horizontal center
+        // Spawn bullet from the top edge of the player, adjusted for bullet height
+        const bulletYTop = playerRect.top - BULLET_HEIGHT; 
+        playerBullets.push(createBullet(bulletXCenter, bulletYTop, true));
+
+        // Create muzzle flash
+        createMuzzleFlash(playerRect.left + playerRect.width / 2, playerRect.top + playerRect.height * 0.2); // Adjust Y for muzzle
+
+        // Play sound effect without interrupting previous one
+        const tempShootSound = new Audio('shoot.mp3');
+        tempShootSound.volume = 0.5; // Adjust volume if needed
+        tempShootSound.play().catch(e => console.log("Shoot sound play blocked:", e));
+    }
+
+    function enemyShoot() {
+        if (!gameActive) return;
+        const enemyRect = enemy.getBoundingClientRect();
+        const bulletXCenter = enemyRect.left + enemyRect.width / 2; // Enemy's horizontal center
+        // Spawn bullet from the bottom edge of the enemy
+        const bulletYTop = enemyRect.bottom; 
+        enemyBullets.push(createBullet(bulletXCenter, bulletYTop, false));
+
+        // Create muzzle flash
+        createMuzzleFlash(enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height * 0.8); // Adjust Y for muzzle
+
+        // Play sound effect without interrupting previous one
+        const tempShootSound = new Audio('shoot.mp3');
+        tempShootSound.volume = 0.5; // Adjust volume if needed
+        tempShootSound.play().catch(e => console.log("Shoot sound play blocked:", e));
+    }
+
+    // --- Movement ---
+    function updatePlayerPosition() {
+        if (moveLeft) {
+            playerX -= playerSpeed;
+        }
+        if (moveRight) {
+            playerX += playerSpeed;
+        }
+        // Boundary check (adjusted for new entity size)
+        const playerWidth = player.offsetWidth;
+        if (playerX < playerWidth / 2) playerX = playerWidth / 2;
+        if (playerX > window.innerWidth - playerWidth / 2) playerX = window.innerWidth - playerWidth / 2;
+        
+        player.style.left = `${playerX - playerWidth / 2}px`;
+    }
+
+    function updateEnemyPosition() {
+        const enemyRect = enemy.getBoundingClientRect();
+        const playerRect = player.getBoundingClientRect();
+        const screenWidth = window.innerWidth;
+
+        let targetX = playerRect.left + playerRect.width / 2; // Target player's center
+
+        // Introduce more varied random movement and less direct following
+        const randomOffset = (Math.random() - 0.5) * 200; // Larger random offset
+        targetX += randomOffset;
+
+        // Dodge behavior: if player bullet is close, move away
+        playerBullets.forEach(bullet => {
+            const b = bullet.element.getBoundingClientRect();
+            // If bullet is approaching enemy and is horizontally aligned
+            if (b.bottom > enemyRect.top && b.top < enemyRect.bottom &&
+                Math.abs((b.left + b.width / 2) - (enemyRect.left + enemyRect.width / 2)) < enemyRect.width) {
+                // Move away from the bullet's horizontal position
+                if ((b.left + b.width / 2) < (enemyRect.left + enemyRect.width / 2)) {
+                    targetX += enemySpeed * 8; // Move right more aggressively
+                } else {
+                    targetX -= enemySpeed * 8; // Move left more aggressively
+                }
+            }
+        });
+
+        // Clamp targetX within screen bounds
+        targetX = Math.max(enemyRect.width / 2, Math.min(screenWidth - enemyRect.width / 2, targetX));
+
+        // Move towards targetX, but with some inertia/delay
+        const currentEnemyCenter = enemyRect.left + enemyRect.width / 2;
+        if (Math.abs(currentEnemyCenter - targetX) > enemySpeed) { // Only move if target is far enough
+            if (currentEnemyCenter < targetX) {
+                enemyX += enemySpeed;
+            } else {
+                enemyX -= enemySpeed;
+            }
+        } else { // If close to target, introduce more random wandering
+            if (Math.random() < 0.05) { // 5% chance to start wandering
+                enemyDirection *= -1;
+            }
+            enemyX += enemySpeed * enemyDirection * (Math.random() < 0.5 ? 0.5 : 1); // Slower or full speed wandering
+        }
+
+        // Boundary check and direction change (still important for edges)
+        if (enemyX < enemyRect.width / 2) {
+            enemyX = enemyRect.width / 2;
+            enemyDirection = 1;
+        } else if (enemyX > screenWidth - enemyRect.width / 2) {
+            enemyX = screenWidth - enemyRect.width / 2;
+            enemyDirection = -1;
+        }
+        enemy.style.left = `${enemyX - enemyRect.width / 2}px`;
+    }
+
+    // --- Collision Detection ---
+    function checkCollisions() {
+        // Player bullets hitting enemy
+        playerBullets.forEach((bullet, bIndex) => {
+            const b = bullet.element.getBoundingClientRect();
+            const e = enemy.getBoundingClientRect();
+            if (b.left < e.right && b.right > e.left && b.top < e.bottom && b.bottom > e.top) {
+                enemyHealth -= 10; // Damage adjusted for balance
+                bullet.element.remove();
+                playerBullets.splice(bIndex, 1);
+                updateHealthBars();
+                hitSound.currentTime = 0; // Rewind to start
+                hitSound.play();
+                if (enemyHealth <= 0) {
+                    showGameOver('あなたの勝ち！');
+                }
+            }
+        });
+
+        // Enemy bullets hitting player
+        enemyBullets.forEach((bullet, bIndex) => {
+            const b = bullet.element.getBoundingClientRect();
+            const p = player.getBoundingClientRect();
+            if (b.left < p.right && b.right > p.left && b.top < p.bottom && b.bottom > p.top) {
+                playerHealth -= 10; // Damage adjusted for balance
+                bullet.element.remove();
+                enemyBullets.splice(bIndex, 1);
+                updateHealthBars();
+                hitSound.currentTime = 0; // Rewind to start
+                hitSound.play();
+                if (playerHealth <= 0) {
+                    showGameOver('あなたの負け...');
+                }
+            }
+        });
+
+        // Bullets hitting obstacles
+        const allBullets = [...playerBullets, ...enemyBullets];
+        allBullets.forEach((bullet, bIndex) => {
+            const b = bullet.element.getBoundingClientRect();
+            obstacles.forEach(obstacle => {
+                const o = obstacle.getBoundingClientRect();
+                if (b.left < o.right && b.right > o.left && b.top < o.bottom && b.bottom > o.top) {
+                    bullet.element.remove();
+                    // Remove from respective array
+                    if (playerBullets.includes(bullet)) {
+                        playerBullets.splice(playerBullets.indexOf(bullet), 1);
+                    } else {
+                        enemyBullets.splice(enemyBullets.indexOf(bullet), 1);
+                    }
+                }
+            });
+        });
+    }
+
+    // --- Main Game Loop ---
+    let lastEnemyShotTime = 0;
+    let nextEnemyShotInterval = 1000; // Initial interval
+
+    function gameLoop(timestamp) {
+        if (!gameActive) return;
+
+        // Movement
+        updatePlayerPosition();
+        updateEnemyPosition();
+
+        // Enemy shooting logic
+        if (timestamp - lastEnemyShotTime > nextEnemyShotInterval) {
+            // Check if line of sight is clear
+            const enemyRect = enemy.getBoundingClientRect();
+            const playerRect = player.getBoundingClientRect();
+            let lineOfSightBlocked = false;
+
+            obstacles.forEach(obstacle => {
+                const obstacleRect = obstacle.getBoundingClientRect();
+                // Check if obstacle is horizontally between enemy and player
+                if (Math.max(enemyRect.left, playerRect.left) < Math.min(enemyRect.right, playerRect.right) &&
+                    Math.max(enemyRect.top, playerRect.top) < Math.min(enemyRect.bottom, playerRect.bottom)) {
+                    // More precise check: if obstacle is between enemy and player vertically
+                    if (enemyRect.top < obstacleRect.bottom && playerRect.bottom > obstacleRect.top) {
+                        lineOfSightBlocked = true;
+                    }
+                }
+            });
+
+            if (!lineOfSightBlocked) {
+                enemyShoot();
+                lastEnemyShotTime = timestamp;
+                nextEnemyShotInterval = 500 + Math.random() * 1500; // Random interval between 0.5s and 2s
+            }
+        }
+
+        // Update bullets
+        playerBullets.forEach((bullet, index) => {
+            bullet.y -= bulletSpeed;
+            if (bullet.y < 0) {
+                bullet.element.remove();
+                playerBullets.splice(index, 1);
+            } else {
+                bullet.element.style.top = `${bullet.y}px`;
+            }
+        });
+
+        enemyBullets.forEach((bullet, index) => {
+            bullet.y += bulletSpeed;
+            if (bullet.y > window.innerHeight) {
+                bullet.element.remove();
+                enemyBullets.splice(index, 1);
+            } else {
+                bullet.element.style.top = `${bullet.y}px`;
+            }
+        });
+
+        // Check for hits
+        checkCollisions();
+
+        // Continue loop
+        requestAnimationFrame(gameLoop);
+    }
+
+    // --- Event Listeners ---
+    // Touch controls
+    leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveLeft = true; });
+    leftBtn.addEventListener('touchend', () => { moveLeft = false; });
+    rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveRight = true; });
+    rightBtn.addEventListener('touchend', () => { moveRight = false; });
+    shootBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerShoot(); });
+
+    // Keyboard controls for desktop
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') moveLeft = true;
+        if (e.key === 'ArrowRight') moveRight = true;
+        if (e.key === ' ') playerShoot();
+    });
+    window.addEventListener('keyup', (e) => {
+        if (e.key === 'ArrowLeft') moveLeft = false;
+        if (e.key === 'ArrowRight') moveRight = false;
+    });
+
+    // BGM Control
+    bgmToggleButton.addEventListener('click', () => {
+        if (isBgmPlaying) {
+            gameBGM.pause();
+            bgmToggleButton.textContent = '♪';
+        } else {
+            gameBGM.muted = false;
+            gameBGM.play().catch(e => console.log("BGM play blocked:", e));
+            bgmToggleButton.textContent = '🔇';
+        }
+        isBgmPlaying = !isBgmPlaying;
+    });
+
+    // Title screen buttons
+    startNewGameBtn.addEventListener('click', () => startGame(false));
+    continueGameBtn.addEventListener('click', () => startGame(true));
+    backToTitleBtn.addEventListener('click', initGame);
+
+    // Restart
+    restartBtn.addEventListener('click', () => startGame(false));
+
+    // --- Initial Start ---
+    initGame();
+
+</script>
+</body>
+</html>
