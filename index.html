@@ -29,8 +29,8 @@
         }
         .entity {
             position: absolute;
-            width: 160px; /* Doubled from 80px */
-            height: 160px; /* Doubled from 80px */
+            width: 80px; /* Halved from 160px */
+            height: 80px; /* Halved from 160px */
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -38,49 +38,49 @@
         }
         #player {
             background-image: url('teki.png');
-            bottom: 140px; /* Adjusted for control area and new size */
+            bottom: 70px; /* Halved from 140px */
             left: 50%;
             transform: translateX(-50%);
         }
         #enemy {
             background-image: url('mikata.PNG');
-            top: 100px; /* Doubled from 50px */
+            top: 50px; /* Halved from 100px */
             left: 50%;
             transform: translateX(-50%);
         }
         .bullet {
             position: absolute;
-            width: 20px; /* Doubled from 10px */
-            height: 60px; /* Doubled from 30px */
+            width: 10px; /* Halved from 20px */
+            height: 30px; /* Halved from 60px */
             background: linear-gradient(to bottom, #00ffff, #0077ff); /* Cool blue gradient */
-            border-radius: 10px; /* Adjusted for new size */
-            box-shadow: 0 0 20px #00ffff;
+            border-radius: 5px; /* Halved from 10px */
+            box-shadow: 0 0 10px #00ffff; /* Adjusted */
             z-index: 10;
             animation: bullet-glow 0.5s infinite alternate; /* Pulsing glow */
         }
         .enemy-bullet {
             background: linear-gradient(to bottom, #ff0000, #cc0000); /* Red gradient */
-            box-shadow: 0 0 20px #ff0000;
+            box-shadow: 0 0 10px #ff0000; /* Adjusted */
         }
         /* Muzzle Flash Effect */
         .muzzle-flash {
             position: absolute;
-            width: 80px; /* Size of the flash */
-            height: 80px; /* Size of the flash */
+            width: 40px; /* Halved from 80px */
+            height: 40px; /* Halved from 80px */
             background-color: rgba(255, 255, 0, 0.8); /* Yellowish flash */
             border-radius: 50%; /* Circular flash */
-            box-shadow: 0 0 20px 10px rgba(255, 255, 0, 0.6); /* Glowing effect */
+            box-shadow: 0 0 10px 5px rgba(255, 255, 0, 0.6); /* Halved */
             animation: fadeOut 0.1s forwards; /* Quick fade out */
             z-index: 11; /* Above bullets */
         }
         /* Hit Effect */
         .hit-effect {
             position: absolute;
-            width: 50px; /* Size of the hit effect */
-            height: 50px; /* Size of the hit effect */
+            width: 25px; /* Halved from 50px */
+            height: 25px; /* Halved from 50px */
             background-color: rgba(255, 0, 0, 0.7); /* Reddish hit */
             border-radius: 50%; /* Circular hit */
-            box-shadow: 0 0 15px 5px rgba(255, 0, 0, 0.5); /* Glowing effect */
+            box-shadow: 0 0 7.5px 2.5px rgba(255, 0, 0, 0.5); /* Halved */
             animation: expandAndFade 0.2s forwards; /* Expand and fade out */
             z-index: 12; /* Above muzzle flash */
         }
@@ -94,15 +94,15 @@
         }
         .obstacle {
             position: absolute;
-            width: 200px; /* Doubled from 100px */
-            height: 300px; /* Doubled from 150px */
+            width: 100px; /* Halved from 200px */
+            height: 150px; /* Halved from 300px */
             background-image: url('tree.PNG');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             z-index: 5; /* Below bullets, above background */
             border-radius: 50%; /* Make trees look more natural */
-            box-shadow: 0 0 15px rgba(0, 128, 0, 0.7); /* Green shadow for trees */
+            box-shadow: 0 0 7.5px rgba(0, 128, 0, 0.7); /* Adjusted */
         }
         #health-bars {
             position: absolute;
@@ -116,8 +116,15 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
             z-index: 100;
         }
+        #score-display {
+            color: #ffcc00; /* Gold color for score */
+            font-size: 1.5em;
+            font-weight: bold;
+            align-self: center; /* Center vertically */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
         .health-bar-container {
-            width: 48%; /* Slightly adjusted for spacing */
+            width: 45%; /* Adjusted for score display */
             background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
             padding: 10px;
             border-radius: 10px;
@@ -235,6 +242,49 @@
             transform: scale(1.1);
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
         }
+        /* On-screen controls */
+        #on-screen-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+        }
+        .control-row {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        #on-screen-controls .control-btn {
+            width: 80px;
+            height: 80px;
+            font-size: 2em;
+            margin: 0 10px;
+            background: linear-gradient(to bottom, #6a82fb, #fc5c7d);
+            color: white;
+            border: 3px solid #fff;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+        #on-screen-controls .control-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        #on-screen-controls #shoot-btn {
+            width: 120px; /* Larger for shoot button */
+        }
         #title-screen {
             position: absolute;
             top: 0;
@@ -310,6 +360,7 @@
                 <div id="player-health-fill" class="health-fill"></div>
             </div>
         </div>
+        <div id="score-display">SCORE: 0</div> <!-- Score Display -->
         <div class="health-bar-container">
             <span>ENEMY</span>
             <div class="health-bar">
@@ -338,6 +389,21 @@
     <div id="bgm-control">
         <button id="bgm-toggle-btn">♪</button>
     </div>
+
+    <!-- On-screen controls for mobile -->
+    <div id="on-screen-controls">
+        <div class="control-row">
+            <button id="up-btn" class="control-btn">▲</button>
+        </div>
+        <div class="control-row">
+            <button id="left-btn" class="control-btn">◀</button>
+            <button id="shoot-btn" class="control-btn">FIRE</button>
+            <button id="right-btn" class="control-btn">▶</button>
+        </div>
+        <div class="control-row">
+            <button id="down-btn" class="control-btn">▼</button>
+        </div>
+    </div>
 </div>
 
 <!-- Title Screen -->
@@ -354,11 +420,7 @@
 <audio id="hit-sound" src="hit.mp3"></audio>
 
 <!-- Controls -->
-<div id="controls">
-    <div class="control-btn" id="left-btn">左</div>
-    <div class="control-btn" id="shoot-btn">撃つ</div>
-    <div class="control-btn" id="right-btn">右</div>
-</div>
+
 
 <script>
     // Game elements
@@ -378,6 +440,7 @@
     const startNewGameBtn = document.getElementById('start-new-game-btn');
     const continueGameBtn = document.getElementById('continue-game-btn');
     const backToTitleBtn = document.getElementById('back-to-title-btn');
+    const scoreDisplay = document.getElementById('score-display');
 
     let isBgmPlaying = false;
 
@@ -385,11 +448,14 @@
     const leftBtn = document.getElementById('left-btn');
     const rightBtn = document.getElementById('right-btn');
     const shootBtn = document.getElementById('shoot-btn');
+    const upBtn = document.getElementById('up-btn');
+    const downBtn = document.getElementById('down-btn');
 
     // Game state
     let playerHealth = 100;
     let enemyHealth = 100;
     let playerX = window.innerWidth / 2;
+    let playerY = window.innerHeight - 100; // Initial Y position for player
     let enemyX = window.innerWidth / 2;
     const playerSpeed = 8;
     const enemySpeed = 4;
@@ -399,13 +465,17 @@
     let enemyBullets = [];
     let obstacles = [];
     let gameActive = true;
+    let currentScore = 0;
+    let highScore = 0;
 
     // Control state
     let moveLeft = false;
     let moveRight = false;
+    let moveUp = false;
+    let moveDown = false;
 
-    const BULLET_WIDTH = 20;
-    const BULLET_HEIGHT = 60;
+    const BULLET_WIDTH = 10; // Halved
+    const BULLET_HEIGHT = 30; // Halved
 
     // --- Game Setup ---
     function initGame() {
@@ -413,6 +483,9 @@
         gameContainer.style.display = 'none';
         titleScreen.style.display = 'flex';
         gameOverScreen.style.display = 'none';
+
+        // Load high score
+        highScore = localStorage.getItem('gunGameHighScore') ? parseInt(localStorage.getItem('gunGameHighScore')) : 0;
 
         // Check for saved game data
         if (localStorage.getItem('gunGameSave')) {
@@ -446,17 +519,21 @@
         } else {
             playerHealth = 100;
             enemyHealth = 100;
-            playerX = window.innerWidth * 0.25; // Player starts on the left side
-            enemyX = window.innerWidth * 0.75; // Enemy starts on the right side
+            playerX = window.innerWidth / 2; // Player starts in center X
+            playerY = window.innerHeight - 100; // Player starts near bottom Y
+            enemyX = window.innerWidth / 2; // Enemy starts in center X
+            currentScore = 0; // Reset score for new game
         }
         
         updateHealthBars();
+        updateScoreDisplay();
         gameOverScreen.style.display = 'none';
         titleScreen.style.display = 'none';
         gameContainer.style.display = 'block';
         
         // Reset positions
         player.style.left = `${playerX - player.offsetWidth / 2}px`;
+        player.style.top = `${playerY - player.offsetHeight / 2}px`; // Set player Y position
         enemy.style.left = `${enemyX - enemy.offsetWidth / 2}px`;
 
         requestAnimationFrame(gameLoop);
@@ -464,9 +541,12 @@
 
     function createObstacles() {
         const obstaclePositions = [
-            { left: 20, top: 40 },
-            { left: 50, top: 30 },
-            { left: 80, top: 40 }
+            { left: 15, top: 30 },
+            { left: 35, top: 50 },
+            { left: 55, top: 30 },
+            { left: 75, top: 50 },
+            { left: 25, top: 60 },
+            { left: 65, top: 40 }
         ];
 
         obstaclePositions.forEach(pos => {
@@ -485,9 +565,14 @@
             playerHealth: playerHealth,
             enemyHealth: enemyHealth,
             playerX: playerX,
-            enemyX: enemyX
+            enemyX: enemyX,
+            currentScore: currentScore
         };
         localStorage.setItem('gunGameSave', JSON.stringify(gameState));
+        if (currentScore > highScore) {
+            highScore = currentScore;
+            localStorage.setItem('gunGameHighScore', highScore);
+        }
         console.log("Game saved!");
     }
 
@@ -499,6 +584,7 @@
             enemyHealth = gameState.enemyHealth;
             playerX = gameState.playerX;
             enemyX = gameState.enemyX;
+            currentScore = gameState.currentScore || 0; // Ensure score is loaded, default to 0
             console.log("Game loaded!");
         } else {
             console.log("No saved game found.");
@@ -513,9 +599,13 @@
         enemyHealthFill.style.width = `${enemyHealth}%`;
     }
 
+    function updateScoreDisplay() {
+        scoreDisplay.textContent = `SCORE: ${currentScore}`;
+    }
+
     function showGameOver(message) {
         gameActive = false;
-        gameOverText.textContent = message;
+        gameOverText.innerHTML = `${message}<br>SCORE: ${currentScore}<br>HIGH SCORE: ${highScore}`;
         gameOverScreen.style.display = 'flex';
         saveGame(); // Save game state on game over
         // Remove all obstacles
@@ -546,7 +636,7 @@
         playerBullets.push(createBullet(bulletXCenter, bulletYTop, true));
 
         // Create muzzle flash
-        createMuzzleFlash(playerRect.left + playerRect.width / 2, playerRect.top + playerRect.height * 0.2); // Adjust Y for muzzle
+        createMuzzleFlash(playerRect.left + playerRect.width / 2, playerRect.top + playerRect.height * 0.2);
 
         // Play sound effect without interrupting previous one
         const tempShootSound = new Audio('shoot.mp3');
@@ -563,12 +653,37 @@
         enemyBullets.push(createBullet(bulletXCenter, bulletYTop, false));
 
         // Create muzzle flash
-        createMuzzleFlash(enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height * 0.8); // Adjust Y for muzzle
+        createMuzzleFlash(enemyRect.left + enemyRect.width / 2, enemyRect.top + enemyRect.height * 0.8);
 
         // Play sound effect without interrupting previous one
         const tempShootSound = new Audio('shoot.mp3');
         tempShootSound.volume = 0.5; // Adjust volume if needed
         tempShootSound.play().catch(e => console.log("Shoot sound play blocked:", e));
+    }
+
+    // --- Visual Effects ---
+    function createMuzzleFlash(x, y) {
+        const flash = document.createElement('div');
+        flash.className = 'muzzle-flash';
+        // Center the flash on the coordinates
+        flash.style.left = `${x - 20}px`; // 40px width / 2
+        flash.style.top = `${y - 20}px`;  // 40px height / 2
+        gameContainer.appendChild(flash);
+        setTimeout(() => {
+            flash.remove();
+        }, 100); // Matches animation duration
+    }
+
+    function createHitEffect(x, y) {
+        const hit = document.createElement('div');
+        hit.className = 'hit-effect';
+        // Center the effect on the coordinates
+        hit.style.left = `${x - 12.5}px`; // 25px width / 2
+        hit.style.top = `${y - 12.5}px`;  // 25px height / 2
+        gameContainer.appendChild(hit);
+        setTimeout(() => {
+            hit.remove();
+        }, 200); // Matches animation duration
     }
 
     // --- Movement ---
@@ -579,12 +694,24 @@
         if (moveRight) {
             playerX += playerSpeed;
         }
+        if (moveUp) {
+            playerY -= playerSpeed;
+        }
+        if (moveDown) {
+            playerY += playerSpeed;
+        }
+
         // Boundary check (adjusted for new entity size)
         const playerWidth = player.offsetWidth;
+        const playerHeight = player.offsetHeight;
+
         if (playerX < playerWidth / 2) playerX = playerWidth / 2;
         if (playerX > window.innerWidth - playerWidth / 2) playerX = window.innerWidth - playerWidth / 2;
+        if (playerY < playerHeight / 2) playerY = playerHeight / 2;
+        if (playerY > window.innerHeight - playerHeight / 2) playerY = window.innerHeight - playerHeight / 2;
         
         player.style.left = `${playerX - playerWidth / 2}px`;
+        player.style.top = `${playerY - playerHeight / 2}px`;
     }
 
     function updateEnemyPosition() {
@@ -650,11 +777,17 @@
             const e = enemy.getBoundingClientRect();
             if (b.left < e.right && b.right > e.left && b.top < e.bottom && b.bottom > e.top) {
                 enemyHealth -= 10; // Damage adjusted for balance
+                currentScore += 10; // Increase score
+                updateScoreDisplay(); // Update score display
                 bullet.element.remove();
                 playerBullets.splice(bIndex, 1);
                 updateHealthBars();
                 hitSound.currentTime = 0; // Rewind to start
-                hitSound.play();
+                // hitSound.play(); // Replaced with new Audio instance
+                const tempHitSound = new Audio('hit.mp3');
+                tempHitSound.volume = 0.5; // Adjust volume if needed
+                tempHitSound.play().catch(e => console.log("Hit sound play blocked:", e));
+                createHitEffect(e.left + e.width / 2, e.top + e.height / 2); // Create hit effect at enemy center
                 if (enemyHealth <= 0) {
                     showGameOver('あなたの勝ち！');
                 }
@@ -671,7 +804,11 @@
                 enemyBullets.splice(bIndex, 1);
                 updateHealthBars();
                 hitSound.currentTime = 0; // Rewind to start
-                hitSound.play();
+                // hitSound.play(); // Replaced with new Audio instance
+                const tempHitSound = new Audio('hit.mp3');
+                tempHitSound.volume = 0.5; // Adjust volume if needed
+                tempHitSound.play().catch(e => console.log("Hit sound play blocked:", e));
+                createHitEffect(p.left + p.width / 2, p.top + p.height / 2); // Create hit effect at player center
                 if (playerHealth <= 0) {
                     showGameOver('あなたの負け...');
                 }
@@ -764,21 +901,39 @@
 
     // --- Event Listeners ---
     // Touch controls
-    leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveLeft = true; });
-    leftBtn.addEventListener('touchend', () => { moveLeft = false; });
-    rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveRight = true; });
-    rightBtn.addEventListener('touchend', () => { moveRight = false; });
-    shootBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerShoot(); });
+    if (leftBtn) {
+        leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveLeft = true; });
+        leftBtn.addEventListener('touchend', () => { moveLeft = false; });
+    }
+    if (rightBtn) {
+        rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveRight = true; });
+        rightBtn.addEventListener('touchend', () => { moveRight = false; });
+    }
+    if (upBtn) {
+        upBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveUp = true; });
+        upBtn.addEventListener('touchend', () => { moveUp = false; });
+    }
+    if (downBtn) {
+        downBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveDown = true; });
+        downBtn.addEventListener('touchend', () => { moveDown = false; });
+    }
+    if (shootBtn) {
+        shootBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerShoot(); });
+    }
 
     // Keyboard controls for desktop
     window.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') moveLeft = true;
         if (e.key === 'ArrowRight') moveRight = true;
+        if (e.key === 'ArrowUp') moveUp = true;
+        if (e.key === 'ArrowDown') moveDown = true;
         if (e.key === ' ') playerShoot();
     });
     window.addEventListener('keyup', (e) => {
         if (e.key === 'ArrowLeft') moveLeft = false;
         if (e.key === 'ArrowRight') moveRight = false;
+        if (e.key === 'ArrowUp') moveUp = false;
+        if (e.key === 'ArrowDown') moveDown = false;
     });
 
     // BGM Control
