@@ -38,15 +38,9 @@
         }
         #player {
             background-image: url('teki.png');
-            bottom: 70px; /* Halved from 140px */
-            left: 50%;
-            transform: translateX(-50%);
         }
-        #enemy {
+        .enemy {
             background-image: url('mikata.PNG');
-            top: 50px; /* Halved from 100px */
-            left: 50%;
-            transform: translateX(-50%);
         }
         .bullet {
             position: absolute;
@@ -104,48 +98,35 @@
             border-radius: 50%; /* Make trees look more natural */
             box-shadow: 0 0 7.5px rgba(0, 128, 0, 0.7); /* Adjusted */
         }
-        #health-bars {
+        /* Character Health Bars */
+        .character-health-bar-container {
+            position: absolute;
+            top: -15px; /* Position above the character */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px; /* Smaller bar */
+            height: 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #555;
+        }
+        .character-health-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to right, #ff416c, #ff4b2b); /* Red-orange gradient */
+            border-radius: 4px;
+            transition: width 0.1s ease-out;
+        }
+        #score-display {
             position: absolute;
             top: 20px;
             left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-            color: #e0e0e0;
-            font-size: 1.2em;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-            z-index: 100;
-        }
-        #score-display {
             color: #ffcc00; /* Gold color for score */
             font-size: 1.5em;
             font-weight: bold;
-            align-self: center; /* Center vertically */
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-        }
-        .health-bar-container {
-            width: 45%; /* Adjusted for score display */
-            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-            padding: 10px;
-            border-radius: 10px;
-            border: 2px solid #555;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        .health-bar {
-            width: 100%;
-            height: 25px; /* Slightly taller */
-            background-color: #333;
-            border: 1px solid #888;
-            margin-top: 8px;
-            border-radius: 5px;
-            overflow: hidden; /* Ensure fill stays within bounds */
-        }
-        .health-fill {
-            height: 100%;
-            background: linear-gradient(to right, #ff416c, #ff4b2b); /* Red-orange gradient for health */
-            width: 100%;
-            transition: width 0.3s ease-out;
-            border-radius: 5px;
+            z-index: 100;
         }
         #controls {
             position: absolute;
@@ -242,42 +223,6 @@
             transform: scale(1.1);
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
         }
-        /* New Touch Controls */
-        #touch-movement-area {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50%; /* Half of the screen for movement */
-            height: 200px; /* Fixed height for the control area */
-            background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
-            z-index: 200;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        #touch-shoot-btn {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 50%; /* Half of the screen for shoot button */
-            height: 200px; /* Fixed height for the control area */
-            background: linear-gradient(to right, #ff416c, #ff4b2b); /* Reddish gradient */
-            color: white;
-            font-size: 3em;
-            border: none;
-            border-top-left-radius: 20px;
-            cursor: pointer;
-            user-select: none;
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
-            z-index: 200;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background 0.2s ease-in-out;
-        }
-        #touch-shoot-btn:active {
-            background: linear-gradient(to right, #cc3355, #cc3c22);
-        }
         #title-screen {
             position: absolute;
             top: 0;
@@ -291,23 +236,24 @@
             color: #e0e0e0;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Reverted to center */
+            justify-content: flex-start; /* Align content to the top */
             align-items: center;
             font-size: 2.5em;
             text-align: center;
             z-index: 300;
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
-            padding-top: 0; /* Remove padding */
+            padding-top: 5vh; /* Add some top padding */
         }
         #title-screen h1 {
             font-size: 2.5em;
-            margin-bottom: 30px;
+            margin-top: 20px; /* Adjusted margin */
+            margin-bottom: 20px; /* Adjusted margin */
             color: #ffcc00;
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
         }
         #title-screen p {
             font-size: 0.7em;
-            margin-bottom: 40px;
+            margin-bottom: 30px; /* Adjusted margin */
             max-width: 90%;
             line-height: 1.5;
             background-color: rgba(0, 0, 0, 0.5);
@@ -345,31 +291,29 @@
 <body>
 
 <div id="game-container" style="display: none;">
-    <!-- Health Bars -->
-    <div id="health-bars">
-        <div class="health-bar-container">
-            <span>PLAYER</span>
-            <div class="health-bar">
-                <div id="player-health-fill" class="health-fill"></div>
-            </div>
+    <div id="score-display">SCORE: 0</div> <!-- Score Display -->
+    <div id="player" class="entity">
+        <div class="character-health-bar-container">
+            <div id="player-character-health-fill" class="character-health-fill"></div>
         </div>
-        <div id="score-display">SCORE: 0</div> <!-- Score Display -->
-        <div class="health-bar-container">
-            <span>ENEMY</span>
-            <div class="health-bar">
-                <div id="enemy-health-fill" class="health-fill"></div>
-            </div>
+    </div>
+    <div id="enemy1" class="entity enemy">
+        <div class="character-health-bar-container">
+            <div id="enemy1-character-health-fill" class="character-health-fill"></div>
+        </div>
+    </div>
+    <div id="enemy2" class="entity enemy">
+        <div class="character-health-bar-container">
+            <div id="enemy2-character-health-fill" class="character-health-fill"></div>
+        </div>
+    </div>
+    <div id="enemy3" class="entity enemy">
+        <div class="character-health-bar-container">
+            <div id="enemy3-character-health-fill" class="character-health-fill"></div>
         </div>
     </div>
 
-    <!-- Game Entities -->
-    <div id="player" class="entity"></div>
-    <div id="enemy" class="entity"></div>
-
     <!-- Obstacles -->
-    <div class="obstacle" style="left: 20%; top: 40%;"></div>
-    <div class="obstacle" style="left: 50%; top: 30%;"></div>
-    <div class="obstacle" style="left: 80%; top: 40%;"></div>
 
     <!-- Game Over Screen -->
     <div id="game-over-screen">
@@ -382,10 +326,6 @@
     <div id="bgm-control">
         <button id="bgm-toggle-btn">♪</button>
     </div>
-
-    <!-- New Touch Controls -->
-    <div id="touch-movement-area"></div>
-    <button id="touch-shoot-btn">FIRE</button>
 </div>
 
 <!-- Title Screen -->
@@ -408,9 +348,17 @@
     // Game elements
     const gameContainer = document.getElementById('game-container');
     const player = document.getElementById('player');
-    const enemy = document.getElementById('enemy');
-    const playerHealthFill = document.getElementById('player-health-fill');
-    const enemyHealthFill = document.getElementById('enemy-health-fill');
+    const enemy1 = document.getElementById('enemy1');
+    const enemy2 = document.getElementById('enemy2');
+    const enemy3 = document.getElementById('enemy3');
+    const enemies = [enemy1, enemy2, enemy3];
+
+    const playerCharacterHealthFill = document.getElementById('player-character-health-fill');
+    const enemy1CharacterHealthFill = document.getElementById('enemy1-character-health-fill');
+    const enemy2CharacterHealthFill = document.getElementById('enemy2-character-health-fill');
+    const enemy3CharacterHealthFill = document.getElementById('enemy3-character-health-fill');
+    const enemyCharacterHealthFills = [enemy1CharacterHealthFill, enemy2CharacterHealthFill, enemy3CharacterHealthFill];
+
     const gameOverScreen = document.getElementById('game-over-screen');
     const gameOverText = document.getElementById('game-over-text');
     const restartBtn = document.getElementById('restart-btn');
@@ -426,21 +374,20 @@
 
     let isBgmPlaying = false;
 
-    // New Touch Controls
-    const touchMovementArea = document.getElementById('touch-movement-area');
-    const touchShootBtn = document.getElementById('touch-shoot-btn');
-
     // Game state
     let playerHealth = 100;
-    let enemyHealth = 100;
+    let enemyHealths = [100, 100, 100]; // Health for each enemy
     let playerX = window.innerWidth / 2;
     let playerY = window.innerHeight - 100; // Initial Y position for player
-    let enemyX = window.innerWidth / 2;
-    let enemyY = 50; // Initial Y position for enemy
+    let playerTargetX = playerX; // Target X for player movement (for touch/mouse)
+    let playerTargetY = playerY; // Target Y for player movement (for touch/mouse)
+    let enemyPositions = [
+        { x: window.innerWidth / 4, y: 50, direction: 1, yDirection: 1, lastShotTime: 0, nextShotInterval: 1000, behavior: 'aggressive' },
+        { x: window.innerWidth / 2, y: 50, direction: 1, yDirection: 1, lastShotTime: 0, nextShotInterval: 1000, behavior: 'defensive' },
+        { x: window.innerWidth * 3 / 4, y: 50, direction: 1, yDirection: 1, lastShotTime: 0, nextShotInterval: 1000, behavior: 'sniper' }
+    ];
     const playerSpeed = 8;
     const enemySpeed = 4;
-    let enemyDirection = 1; // 1 for right, -1 for left
-    let enemyYDirection = 1; // 1 for down, -1 for up
     const bulletSpeed = 10;
     let playerBullets = [];
     let enemyBullets = [];
@@ -448,13 +395,28 @@
     let gameActive = true;
     let currentScore = 0;
     let highScore = 0;
+    
+    // New vertical scrolling variables
+    let fieldHeight = window.innerHeight * 3; // 3x screen height
+    let currentFieldY = 0; // Current scroll position
+    let playerProgress = 0; // Player's progress through the field (0-100%)
+    let victoryY = fieldHeight - window.innerHeight; // Y position where player wins
+    let enemySpawnPoints = []; // Pre-defined enemy spawn locations
+    let currentEnemyWave = 0;
+    let maxEnemyWaves = 5;
+    let waveCleared = false; // Flag to track if current wave is cleared
+    let nextWaveDelay = 3000; // 3 seconds delay between waves
+    let lastWaveClearTime = 0; // Timestamp when last wave was cleared
 
-    // Control state for touch
-    let isTouching = false;
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchCurrentX = 0;
-    let touchCurrentY = 0;
+    // Control state for keyboard
+    let moveLeft = false;
+    let moveRight = false;
+    let moveUp = false;
+    let moveDown = false;
+
+    // Control state for touch/mouse
+    let isTouchMoving = false;
+    let isMouseMoving = false;
 
     const BULLET_WIDTH = 10; // Halved
     const BULLET_HEIGHT = 30; // Halved
@@ -484,6 +446,48 @@
         isBgmPlaying = false;
     }
 
+    function setupField() {
+        // Initialize 9 predefined enemy spawn positions throughout the field
+        enemySpawnPoints = [];
+        
+        // Define 9 strategic positions across the field
+        const spawnPositions = [
+            // Bottom row (near player spawn)
+            { x: window.innerWidth * 0.2, y: fieldHeight * 0.2, name: 'Gatekeeper' },
+            { x: window.innerWidth * 0.5, y: fieldHeight * 0.15, name: 'Center Guard' },
+            { x: window.innerWidth * 0.8, y: fieldHeight * 0.2, name: 'Right Sentinel' },
+            
+            // Middle row (mid-field)
+            { x: window.innerWidth * 0.15, y: fieldHeight * 0.45, name: 'Left Flank' },
+            { x: window.innerWidth * 0.5, y: fieldHeight * 0.4, name: 'Mid Commander' },
+            { x: window.innerWidth * 0.85, y: fieldHeight * 0.45, name: 'Right Flank' },
+            
+            // Top row (near victory point)
+            { x: window.innerWidth * 0.25, y: fieldHeight * 0.7, name: 'Upper Left' },
+            { x: window.innerWidth * 0.5, y: fieldHeight * 0.65, name: 'Final Boss' },
+            { x: window.innerWidth * 0.75, y: fieldHeight * 0.7, name: 'Upper Right' }
+        ];
+        
+        // Create individual enemies at each position
+        spawnPositions.forEach((pos, index) => {
+            const behaviors = ['aggressive', 'defensive', 'sniper'];
+            const behavior = behaviors[index % 3]; // Distribute behaviors evenly
+            
+            enemySpawnPoints.push({
+                x: pos.x,
+                y: pos.y,
+                health: 100,
+                behavior: behavior,
+                name: pos.name,
+                spawnX: pos.x, // Store original spawn position
+                spawnY: pos.y,
+                lastShotTime: 0,
+                nextShotInterval: 800 + Math.random() * 1200,
+                isActive: true // Track if this enemy is still alive
+            });
+        });
+    }
+
     function startGame(loadSavedGame = false) {
         gameActive = true;
         playerBullets.forEach(b => b.element.remove());
@@ -494,20 +498,28 @@
         // Clear existing obstacles and create new ones
         obstacles.forEach(o => o.remove());
         obstacles = [];
-        createObstacles();
+        
+        // Setup field and spawn points
+        setupField();
+        createStrategicObstacles();
 
         if (loadSavedGame) {
             loadGame();
         } else {
             playerHealth = 100;
-            enemyHealth = 100;
             playerX = window.innerWidth / 2; // Player starts in center X
             playerY = window.innerHeight - 100; // Player starts near bottom Y
-            targetX = playerX;
-            targetY = playerY;
-            enemyX = window.innerWidth / 2; // Enemy starts in center X
-            enemyY = 50; // Enemy starts near top Y
+            playerTargetX = playerX;
+            playerTargetY = playerY;
+            currentFieldY = 0;
+            playerProgress = 0;
+            currentEnemyWave = 0;
+            waveCleared = false;
+            lastWaveClearTime = 0;
             currentScore = 0; // Reset score for new game
+            
+            // Initialize first wave of enemies
+            spawnEnemyWave(0);
         }
         
         updateHealthBars();
@@ -516,45 +528,102 @@
         titleScreen.style.display = 'none';
         gameContainer.style.display = 'block';
         
-        // Reset positions
+        // Reset positions and display for all entities
         player.style.left = `${playerX - player.offsetWidth / 2}px`;
-        player.style.top = `${playerY - player.offsetHeight / 2}px`; // Set player Y position
-        enemy.style.left = `${enemyX - enemy.offsetWidth / 2}px`;
-        enemy.style.top = `${enemyY - enemy.offsetHeight / 2}px`; // Set enemy Y position
+        player.style.top = `${playerY - player.offsetHeight / 2}px`;
 
         requestAnimationFrame(gameLoop);
     }
 
-    function createObstacles() {
-        const obstaclePositions = [
-            { left: 15, top: 30 },
-            { left: 35, top: 50 },
-            { left: 55, top: 30 },
-            { left: 75, top: 50 },
-            { left: 25, top: 60 },
-            { left: 65, top: 40 }
+    function createStrategicObstacles() {
+        const numObstacles = 12; // More obstacles for strategic placement
+        const obstacleImages = ['tree.PNG', 'tree2.PNG'];
+        
+        // Create strategic obstacle positions
+        const strategicPositions = [
+            // Bottom area - cover for player
+            { x: 15, y: 80, image: 'tree.PNG' },
+            { x: 85, y: 75, image: 'tree2.PNG' },
+            { x: 50, y: 85, image: 'tree.PNG' },
+            
+            // Middle area - chokepoints
+            { x: 25, y: 45, image: 'tree2.PNG' },
+            { x: 75, y: 40, image: 'tree.PNG' },
+            { x: 10, y: 50, image: 'tree.PNG' },
+            { x: 90, y: 55, image: 'tree2.PNG' },
+            
+            // Upper area - enemy cover
+            { x: 35, y: 25, image: 'tree.PNG' },
+            { x: 65, y: 20, image: 'tree2.PNG' },
+            { x: 15, y: 30, image: 'tree2.PNG' },
+            { x: 85, y: 35, image: 'tree.PNG' },
+            { x: 50, y: 15, image: 'tree.PNG' }
         ];
-
-        obstaclePositions.forEach(pos => {
+        
+        for (let i = 0; i < numObstacles; i++) {
             const obstacle = document.createElement('div');
             obstacle.className = 'obstacle';
-            obstacle.style.left = `${pos.left}%`;
-            obstacle.style.top = `${pos.top}%`;
+            const pos = strategicPositions[i];
+            obstacle.style.backgroundImage = `url('${pos.image}')`;
+            obstacle.style.left = `${pos.x}%`;
+            obstacle.style.top = `${pos.y}%`;
             gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
+        }
+    }
+
+    function spawnEnemyWave(waveIndex) {
+        // This function is now used to spawn individual enemies
+        // Clear existing enemies
+        enemies.forEach(enemy => {
+            enemy.style.display = 'none';
         });
+        
+        // Spawn enemies based on their field position and current scroll
+        enemySpawnPoints.forEach((enemyData, index) => {
+            if (index < enemies.length && enemyData.isActive) {
+                const enemy = enemies[index];
+                enemy.style.display = 'block';
+                enemy.style.left = `${enemyData.x - enemy.offsetWidth / 2}px`;
+                enemy.style.top = `${enemyData.y - currentFieldY - enemy.offsetHeight / 2}px`;
+                
+                // Update enemy position data
+                enemyPositions[index] = {
+                    x: enemyData.x,
+                    y: enemyData.y,
+                    health: enemyData.health,
+                    behavior: enemyData.behavior,
+                    name: enemyData.name,
+                    spawnX: enemyData.spawnX,
+                    spawnY: enemyData.spawnY,
+                    lastShotTime: enemyData.lastShotTime,
+                    nextShotInterval: enemyData.nextShotInterval,
+                    isActive: enemyData.isActive,
+                    direction: 1,
+                    yDirection: 1
+                };
+            }
+        });
+        
+        // Hide unused enemies
+        for (let i = enemySpawnPoints.length; i < enemies.length; i++) {
+            enemies[i].style.display = 'none';
+        }
     }
 
     // --- Save/Load Game ---
     function saveGame() {
         const gameState = {
             playerHealth: playerHealth,
-            enemyHealth: enemyHealth,
             playerX: playerX,
             playerY: playerY,
-            enemyX: enemyX,
-            enemyY: enemyY,
-            currentScore: currentScore
+            enemyPositions: enemyPositions,
+            currentScore: currentScore,
+            currentFieldY: currentFieldY,
+            playerProgress: playerProgress,
+            currentEnemyWave: currentEnemyWave,
+            waveCleared: waveCleared,
+            lastWaveClearTime: lastWaveClearTime
         };
         localStorage.setItem('gunGameSave', JSON.stringify(gameState));
         if (currentScore > highScore) {
@@ -569,14 +638,37 @@
         if (savedState) {
             const gameState = JSON.parse(savedState);
             playerHealth = gameState.playerHealth;
-            enemyHealth = gameState.enemyHealth;
             playerX = gameState.playerX;
             playerY = gameState.playerY;
-            targetX = playerX; // Set target to current position on load
-            targetY = playerY; // Set target to current position on load
-            enemyX = gameState.enemyX;
-            enemyY = gameState.enemyY;
+            playerTargetX = gameState.playerX; // Set target to current position on load
+            playerTargetY = gameState.playerY; // Set target to current position on load
+            enemyPositions = gameState.enemyPositions;
             currentScore = gameState.currentScore || 0; // Ensure score is loaded, default to 0
+            currentFieldY = gameState.currentFieldY || 0;
+            playerProgress = gameState.playerProgress || 0;
+            currentEnemyWave = gameState.currentEnemyWave || 0;
+            waveCleared = gameState.waveCleared || false;
+            lastWaveClearTime = gameState.lastWaveClearTime || 0;
+            
+            // Ensure enemy positions have the required properties
+            enemyPositions.forEach((pos, index) => {
+                if (!pos.hasOwnProperty('lastShotTime')) {
+                    pos.lastShotTime = 0;
+                }
+                if (!pos.hasOwnProperty('nextShotInterval')) {
+                    pos.nextShotInterval = 1000;
+                }
+                if (!pos.hasOwnProperty('health')) {
+                    pos.health = 100;
+                }
+                if (!pos.hasOwnProperty('behavior')) {
+                    pos.behavior = 'aggressive';
+                }
+            });
+            
+            // Spawn the current wave
+            spawnEnemyWave(currentEnemyWave);
+            
             console.log("Game loaded!");
         } else {
             console.log("No saved game found.");
@@ -587,12 +679,32 @@
 
     // --- Health and UI ---
     function updateHealthBars() {
-        playerHealthFill.style.width = `${playerHealth}%`;
-        enemyHealthFill.style.width = `${enemyHealth}%`;
+        playerCharacterHealthFill.style.width = `${playerHealth}%`;
+
+        enemies.forEach((enemy, index) => {
+            if (enemyPositions[index]) {
+                const health = enemyPositions[index].health;
+                enemyCharacterHealthFills[index].style.width = `${health}%`;
+                if (health <= 0) {
+                    enemy.style.display = 'none'; // Hide defeated enemy
+                } else {
+                    enemy.style.display = 'block'; // Ensure active enemy is visible
+                }
+            } else {
+                enemy.style.display = 'none'; // Hide if no position data
+            }
+        });
     }
 
     function updateScoreDisplay() {
-        scoreDisplay.textContent = `SCORE: ${currentScore}`;
+        let waveInfo = '';
+        if (waveCleared) {
+            const timeLeft = Math.max(0, Math.round((nextWaveDelay - (performance.now() - lastWaveClearTime)) / 1000));
+            waveInfo = ` | NEXT WAVE: ${timeLeft}s`;
+        } else {
+            waveInfo = ` | WAVE: ${currentEnemyWave + 1}/${enemySpawnPoints.length}`;
+        }
+        scoreDisplay.textContent = `SCORE: ${currentScore} | PROGRESS: ${Math.round(playerProgress)}%${waveInfo}`;
     }
 
     function showGameOver(message) {
@@ -638,7 +750,14 @@
 
     function enemyShoot() {
         if (!gameActive) return;
-        const enemyRect = enemy.getBoundingClientRect();
+
+        const aliveEnemies = enemies.filter((enemy, index) => 
+            enemyPositions[index] && enemyPositions[index].health > 0
+        );
+        if (aliveEnemies.length === 0) return; // No alive enemies to shoot from
+
+        const shootingEnemy = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+        const enemyRect = shootingEnemy.getBoundingClientRect();
         const bulletXCenter = enemyRect.left + enemyRect.width / 2; // Enemy's horizontal center
         // Spawn bullet from the bottom edge of the enemy
         const bulletYTop = enemyRect.bottom; 
@@ -680,133 +799,206 @@
 
     // --- Movement ---
     function updatePlayerPosition() {
-        // Move player towards targetX and targetY
-        const dx = targetX - playerX;
-        const dy = targetY - playerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance > playerSpeed) {
-            playerX += (dx / distance) * playerSpeed;
-            playerY += (dy / distance) * playerSpeed;
-        } else {
-            playerX = targetX;
-            playerY = targetY;
-        }
-
-        // Boundary check
         const playerWidth = player.offsetWidth;
         const playerHeight = player.offsetHeight;
 
+        let movedByKeyboard = false;
+        if (moveLeft) {
+            playerX -= playerSpeed;
+            movedByKeyboard = true;
+        }
+        if (moveRight) {
+            playerX += playerSpeed;
+            movedByKeyboard = true;
+        }
+        if (moveUp) {
+            playerY -= playerSpeed;
+            movedByKeyboard = true;
+        }
+        if (moveDown) {
+            playerY += playerSpeed;
+            movedByKeyboard = true;
+        }
+
+        if (!movedByKeyboard) {
+            // If not moved by keyboard, try to move towards touch/mouse target
+            const dx = playerTargetX - playerX;
+            const dy = playerTargetY - playerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > playerSpeed) {
+                playerX += (dx / distance) * playerSpeed;
+                playerY += (dy / distance) * playerSpeed;
+            } else {
+                playerX = playerTargetX;
+                playerY = playerTargetY;
+                // Once target is reached, reset target to current position to stop further movement
+                playerTargetX = playerX;
+                playerTargetY = playerY;
+            }
+        } else {
+            // If moved by keyboard, ensure touch/mouse target is aligned with current position
+            // so that when keyboard is released, player doesn't jump to an old touch target
+            playerTargetX = playerX;
+            playerTargetY = playerY;
+        }
+
+        // Boundary check - allow upward movement for vertical scrolling
         playerX = Math.max(playerWidth / 2, Math.min(window.innerWidth - playerWidth / 2, playerX));
-        playerY = Math.max(playerHeight / 2, Math.min(window.innerHeight - playerHeight / 2, playerY));
+        // Allow player to move up beyond screen bounds for scrolling
+        playerY = Math.max(playerHeight / 2, Math.min(fieldHeight - playerHeight / 2, playerY));
         
         player.style.left = `${playerX - playerWidth / 2}px`;
         player.style.top = `${playerY - playerHeight / 2}px`;
     }
 
     function updateEnemyPosition() {
-        const enemyRect = enemy.getBoundingClientRect();
-        const playerRect = player.getBoundingClientRect();
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
+        enemies.forEach((enemy, index) => {
+            if (!enemyPositions[index] || enemyPositions[index].health <= 0) return; // Skip defeated enemies
 
-        let targetX = playerRect.left + playerRect.width / 2; // Target player's center X
-        let targetY = playerRect.top + playerRect.height / 2; // Target player's center Y
+            const enemyRect = enemy.getBoundingClientRect();
+            const playerRect = player.getBoundingClientRect();
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const behavior = enemyPositions[index].behavior;
 
-        // Introduce more varied random movement and less direct following
-        const randomOffsetX = (Math.random() - 0.5) * 200; // Larger random offset
-        const randomOffsetY = (Math.random() - 0.5) * 100; // Larger random offset for Y
-        targetX += randomOffsetX;
-        targetY += randomOffsetY;
+            let targetX = playerRect.left + playerRect.width / 2; // Target player's center X
+            let targetY = playerRect.top + playerRect.height / 2; // Target player's center Y
 
-        // Dodge behavior: if player bullet is close, move away
-        playerBullets.forEach(bullet => {
-            const b = bullet.element.getBoundingClientRect();
-            // If bullet is approaching enemy and is horizontally aligned
-            if (b.bottom > enemyRect.top && b.top < enemyRect.bottom &&
-                Math.abs((b.left + b.width / 2) - (enemyRect.left + enemyRect.width / 2)) < enemyRect.width) {
-                // Move away from the bullet's horizontal position
-                if ((b.left + b.width / 2) < (enemyRect.left + enemyRect.width / 2)) {
-                    targetX += enemySpeed * 8; // Move right more aggressively
-                } else {
-                    targetX -= enemySpeed * 8; // Move left more aggressively
-                }
+            // Different behaviors for different enemy types
+            switch (behavior) {
+                case 'aggressive':
+                    // Aggressive enemies move directly toward player with small random offset
+                    const aggressiveOffsetX = (Math.random() - 0.5) * 50;
+                    const aggressiveOffsetY = (Math.random() - 0.5) * 30;
+                    targetX += aggressiveOffsetX;
+                    targetY += aggressiveOffsetY;
+                    break;
+                    
+                case 'defensive':
+                    // Defensive enemies try to maintain distance and use cover
+                    const distanceToPlayer = Math.sqrt(
+                        Math.pow(enemyRect.left - playerRect.left, 2) + 
+                        Math.pow(enemyRect.top - playerRect.top, 2)
+                    );
+                    if (distanceToPlayer < 200) {
+                        // Move away from player
+                        const angle = Math.atan2(enemyRect.top - playerRect.top, enemyRect.left - playerRect.left);
+                        targetX = enemyRect.left + Math.cos(angle) * 100;
+                        targetY = enemyRect.top + Math.sin(angle) * 100;
+                    } else {
+                        // Move toward player but slower
+                        targetX += (Math.random() - 0.5) * 100;
+                        targetY += (Math.random() - 0.5) * 50;
+                    }
+                    break;
+                    
+                case 'sniper':
+                    // Sniper enemies try to maintain distance and shoot from afar
+                    const sniperDistance = 300;
+                    const angleToPlayer = Math.atan2(playerRect.top - enemyRect.top, playerRect.left - enemyRect.left);
+                    targetX = playerRect.left + Math.cos(angleToPlayer) * sniperDistance;
+                    targetY = playerRect.top + Math.sin(angleToPlayer) * sniperDistance;
+                    // Add some random movement to avoid being predictable
+                    targetX += (Math.random() - 0.5) * 80;
+                    targetY += (Math.random() - 0.5) * 40;
+                    break;
             }
-            // If bullet is approaching enemy and is vertically aligned
-            if (b.right > enemyRect.left && b.left < enemyRect.right &&
-                Math.abs((b.top + b.height / 2) - (enemyRect.top + enemyRect.height / 2)) < enemyRect.height) {
-                // Move away from the bullet's vertical position
-                if ((b.top + b.height / 2) < (enemyRect.top + enemyRect.height / 2)) {
-                    targetY += enemySpeed * 8; // Move down more aggressively
-                } else {
-                    targetY -= enemySpeed * 8; // Move up more aggressively
+
+            // Dodge behavior: if player bullet is close, move away
+            playerBullets.forEach(bullet => {
+                const b = bullet.element.getBoundingClientRect();
+                const bulletDistance = Math.sqrt(
+                    Math.pow((b.left + b.width / 2) - (enemyRect.left + enemyRect.width / 2), 2) +
+                    Math.pow((b.top + b.height / 2) - (enemyRect.top + enemyRect.height / 2), 2)
+                );
+                
+                if (bulletDistance < 100) {
+                    // Move away from bullet
+                    const dodgeAngle = Math.atan2(enemyRect.top - b.top, enemyRect.left - b.left);
+                    targetX += Math.cos(dodgeAngle) * enemySpeed * 5;
+                    targetY += Math.sin(dodgeAngle) * enemySpeed * 5;
                 }
+            });
+
+            // Clamp targetX and targetY within screen bounds
+            targetX = Math.max(enemyRect.width / 2, Math.min(screenWidth - enemyRect.width / 2, targetX));
+            targetY = Math.max(enemyRect.height / 2, Math.min(screenHeight * 0.6 - enemyRect.height / 2, targetY)); // Limit enemy to top 60% of screen
+
+            // Move towards targetX, but with some inertia/delay
+            const currentEnemyCenterX = enemyPositions[index].x;
+            const currentEnemyCenterY = enemyPositions[index].y;
+
+            const dx = targetX - currentEnemyCenterX;
+            const dy = targetY - currentEnemyCenterY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > enemySpeed) {
+                enemyPositions[index].x += (dx / distance) * enemySpeed;
+                enemyPositions[index].y += (dy / distance) * enemySpeed;
+            } else {
+                enemyPositions[index].x = targetX;
+                enemyPositions[index].y = targetY;
             }
+
+            // Boundary check
+            if (enemyPositions[index].x < enemyRect.width / 2) {
+                enemyPositions[index].x = enemyRect.width / 2;
+            } else if (enemyPositions[index].x > screenWidth - enemyRect.width / 2) {
+                enemyPositions[index].x = screenWidth - enemyRect.width / 2;
+            }
+            if (enemyPositions[index].y < enemyRect.height / 2) {
+                enemyPositions[index].y = enemyRect.height / 2;
+            } else if (enemyPositions[index].y > screenHeight * 0.6 - enemyRect.height / 2) {
+                enemyPositions[index].y = screenHeight * 0.6 - enemyRect.height / 2;
+            }
+
+            // Update enemy position on screen (accounting for field scroll)
+            enemy.style.left = `${enemyPositions[index].x - enemyRect.width / 2}px`;
+            enemy.style.top = `${enemyPositions[index].y - currentFieldY - enemyRect.height / 2}px`;
         });
-
-        // Clamp targetX and targetY within screen bounds
-        targetX = Math.max(enemyRect.width / 2, Math.min(screenWidth - enemyRect.width / 2, targetX));
-        targetY = Math.max(enemyRect.height / 2, Math.min(screenHeight * 0.5 - enemyRect.height / 2, targetY)); // Limit enemy to top half of screen
-
-        // Move towards targetX, but with some inertia/delay
-        const currentEnemyCenterX = enemyRect.left + enemyRect.width / 2;
-        const currentEnemyCenterY = enemyRect.top + enemyRect.height / 2;
-
-        const dx = targetX - currentEnemyCenterX;
-        const dy = targetY - currentEnemyCenterY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance > enemySpeed) {
-            enemyX += (dx / distance) * enemySpeed;
-            enemyY += (dy / distance) * enemySpeed;
-        } else {
-            enemyX = targetX;
-            enemyY = targetY;
-        }
-
-        // Boundary check and direction change (still important for edges)
-        if (enemyX < enemyRect.width / 2) {
-            enemyX = enemyRect.width / 2;
-        } else if (enemyX > screenWidth - enemyRect.width / 2) {
-            enemyX = screenWidth - enemyRect.width / 2;
-        }
-        if (enemyY < enemyRect.height / 2) {
-            enemyY = enemyRect.height / 2;
-        } else if (enemyY > screenHeight * 0.5 - enemyRect.height / 2) { // Limit enemy to top half of screen
-            enemyY = screenHeight * 0.5 - enemyRect.height / 2;
-        }
-
-        enemy.style.left = `${enemyX - enemyRect.width / 2}px`;
-        enemy.style.top = `${enemyY - enemyRect.height / 2}px`;
     }
 
     // --- Collision Detection ---
     function checkCollisions() {
-        // Player bullets hitting enemy
-        playerBullets.forEach((bullet, bIndex) => {
+        // Player bullets hitting enemies - use safer iteration
+        for (let bIndex = playerBullets.length - 1; bIndex >= 0; bIndex--) {
+            const bullet = playerBullets[bIndex];
             const b = bullet.element.getBoundingClientRect();
-            const e = enemy.getBoundingClientRect();
-            if (b.left < e.right && b.right > e.left && b.top < e.bottom && b.bottom > e.top) {
-                enemyHealth -= 10; // Damage adjusted for balance
-                currentScore += 10; // Increase score
-                updateScoreDisplay(); // Update score display
-                bullet.element.remove();
-                playerBullets.splice(bIndex, 1);
-                updateHealthBars();
-                hitSound.currentTime = 0; // Rewind to start
-                // hitSound.play(); // Replaced with new Audio instance
-                const tempHitSound = new Audio('hit.mp3');
-                tempHitSound.volume = 0.5; // Adjust volume if needed
-                tempHitSound.play().catch(e => console.log("Hit sound play blocked:", e));
-                createHitEffect(e.left + e.width / 2, e.top + e.height / 2); // Create hit effect at enemy center
-                if (enemyHealth <= 0) {
-                    showGameOver('あなたの勝ち！');
+            let bulletHit = false;
+            
+            for (let eIndex = 0; eIndex < enemies.length; eIndex++) {
+                // Only check collision if enemy is active
+                if (enemyPositions[eIndex] && enemyPositions[eIndex].health > 0) {
+                    const enemy = enemies[eIndex];
+                    const e = enemy.getBoundingClientRect();
+                    if (b.left < e.right && b.right > e.left && b.top < e.bottom && b.bottom > e.top) {
+                        enemyPositions[eIndex].health -= 10; // Damage specific enemy
+                        currentScore += 10; // Increase score
+                        updateScoreDisplay(); // Update score display
+                        bullet.element.remove();
+                        playerBullets.splice(bIndex, 1);
+                        bulletHit = true;
+                        updateHealthBars(); // Update all health bars
+                        hitSound.currentTime = 0; // Rewind to start
+                        const tempHitSound = new Audio('hit.mp3');
+                        tempHitSound.volume = 0.5; // Adjust volume if needed
+                        tempHitSound.play().catch(e => console.log("Hit sound play blocked:", e));
+                        createHitEffect(e.left + e.width / 2, e.top + e.height / 2); // Create hit effect at enemy center
+
+                        if (enemyPositions[eIndex].health <= 0) {
+                            enemy.style.display = 'none'; // Hide defeated enemy
+                        }
+                        break; // Exit enemy loop since bullet hit
+                    }
                 }
             }
-        });
+            if (bulletHit) continue; // Skip to next bullet if this one hit
+        }
 
-        // Enemy bullets hitting player
-        enemyBullets.forEach((bullet, bIndex) => {
+        // Enemy bullets hitting player - use safer iteration
+        for (let bIndex = enemyBullets.length - 1; bIndex >= 0; bIndex--) {
+            const bullet = enemyBullets[bIndex];
             const b = bullet.element.getBoundingClientRect();
             const p = player.getBoundingClientRect();
             if (b.left < p.right && b.right > p.left && b.top < p.bottom && b.bottom > p.top) {
@@ -815,7 +1007,6 @@
                 enemyBullets.splice(bIndex, 1);
                 updateHealthBars();
                 hitSound.currentTime = 0; // Rewind to start
-                // hitSound.play(); // Replaced with new Audio instance
                 const tempHitSound = new Audio('hit.mp3');
                 tempHitSound.volume = 0.5; // Adjust volume if needed
                 tempHitSound.play().catch(e => console.log("Hit sound play blocked:", e));
@@ -824,25 +1015,38 @@
                     showGameOver('あなたの負け...');
                 }
             }
-        });
+        }
 
-        // Bullets hitting obstacles
+        // Bullets hitting obstacles - use safer iteration
         const allBullets = [...playerBullets, ...enemyBullets];
-        allBullets.forEach((bullet, bIndex) => {
+        for (let bIndex = allBullets.length - 1; bIndex >= 0; bIndex--) {
+            const bullet = allBullets[bIndex];
             const b = bullet.element.getBoundingClientRect();
-            obstacles.forEach(obstacle => {
+            let bulletHitObstacle = false;
+            
+            for (let oIndex = 0; oIndex < obstacles.length; oIndex++) {
+                const obstacle = obstacles[oIndex];
                 const o = obstacle.getBoundingClientRect();
                 if (b.left < o.right && b.right > o.left && b.top < o.bottom && b.bottom > o.top) {
                     bullet.element.remove();
                     // Remove from respective array
                     if (playerBullets.includes(bullet)) {
-                        playerBullets.splice(playerBullets.indexOf(bullet), 1);
+                        const playerIndex = playerBullets.indexOf(bullet);
+                        if (playerIndex !== -1) {
+                            playerBullets.splice(playerIndex, 1);
+                        }
                     } else {
-                        enemyBullets.splice(enemyBullets.indexOf(bullet), 1);
+                        const enemyIndex = enemyBullets.indexOf(bullet);
+                        if (enemyIndex !== -1) {
+                            enemyBullets.splice(enemyIndex, 1);
+                        }
                     }
+                    bulletHitObstacle = true;
+                    break; // Exit obstacle loop since bullet hit
                 }
-            });
-        });
+            }
+            if (bulletHitObstacle) continue; // Skip to next bullet if this one hit
+        }
     }
 
     // --- Main Game Loop ---
@@ -852,120 +1056,201 @@
     function gameLoop(timestamp) {
         if (!gameActive) return;
 
+        // Update player progress and field scroll
+        updateFieldScroll();
+
         // Movement
         updatePlayerPosition();
         updateEnemyPosition();
 
         // Enemy shooting logic
-        if (timestamp - lastEnemyShotTime > nextEnemyShotInterval) {
-            // Check if line of sight is clear
+        enemies.forEach((enemy, index) => {
+            if (!enemyPositions[index] || enemyPositions[index].health <= 0) return; // Skip defeated enemies
+
+            // Check if line of sight is clear for this specific enemy
             const enemyRect = enemy.getBoundingClientRect();
             const playerRect = player.getBoundingClientRect();
             let lineOfSightBlocked = false;
 
             obstacles.forEach(obstacle => {
                 const obstacleRect = obstacle.getBoundingClientRect();
-                // Check if obstacle is horizontally between enemy and player
+                // Check if obstacle is between this enemy and the player
+                // Simplified check: if obstacle overlaps horizontally and vertically with the path
                 if (Math.max(enemyRect.left, playerRect.left) < Math.min(enemyRect.right, playerRect.right) &&
-                    Math.max(enemyRect.top, playerRect.top) < Math.min(enemyRect.bottom, playerRect.bottom)) {
+                    Math.max(enemyRect.top, playerRect.top) < Math.min(enemyRect.bottom, playerRect.bottom) &&
                     // More precise check: if obstacle is between enemy and player vertically
-                    if (enemyRect.top < obstacleRect.bottom && playerRect.bottom > obstacleRect.top) {
-                        lineOfSightBlocked = true;
-                    }
+                    enemyRect.top < obstacleRect.bottom && playerRect.bottom > obstacleRect.top) {
+                    lineOfSightBlocked = true;
                 }
             });
 
-            if (!lineOfSightBlocked) {
-                enemyShoot();
-                lastEnemyShotTime = timestamp;
-                nextEnemyShotInterval = 500 + Math.random() * 1500; // Random interval between 0.5s and 2s
-            }
-        }
-
-        // Update bullets
-        playerBullets.forEach((bullet, index) => {
-            bullet.y -= bulletSpeed;
-            if (bullet.y < 0) {
-                bullet.element.remove();
-                playerBullets.splice(index, 1);
-            } else {
-                bullet.element.style.top = `${bullet.y}px`;
+            // Only shoot if line of sight is clear and it's time to shoot
+            if (!lineOfSightBlocked && timestamp - enemyPositions[index].lastShotTime > enemyPositions[index].nextShotInterval) {
+                enemyShoot(); // Remove the parameters - the function handles enemy selection internally
+                enemyPositions[index].lastShotTime = timestamp;
+                enemyPositions[index].nextShotInterval = 500 + Math.random() * 1500; // Random interval between 0.5s and 2s
             }
         });
 
-        enemyBullets.forEach((bullet, index) => {
-            bullet.y += bulletSpeed;
-            if (bullet.y > window.innerHeight) {
-                bullet.element.remove();
-                enemyBullets.splice(index, 1);
-            } else {
-                bullet.element.style.top = `${bullet.y}px`;
-            }
-        });
+        // Update bullets with proper cleanup
+        updateBullets();
 
         // Check for hits
         checkCollisions();
+
+        // Check for wave completion and victory
+        checkWaveProgress();
 
         // Continue loop
         requestAnimationFrame(gameLoop);
     }
 
+    function updateFieldScroll() {
+        // Calculate player progress based on Y position
+        const playerScreenY = playerY - currentFieldY;
+        const maxPlayerY = window.innerHeight - 150; // Maximum Y position for player
+        
+        if (playerScreenY < maxPlayerY) {
+            // Player is moving up, scroll the field
+            const scrollAmount = maxPlayerY - playerScreenY;
+            currentFieldY += scrollAmount * 0.1; // Smooth scrolling
+            
+            // Update player progress
+            playerProgress = (currentFieldY / victoryY) * 100;
+            
+            // Check for victory
+            if (currentFieldY >= victoryY) {
+                showGameOver('勝利！フィールドを制圧しました！');
+                return;
+            }
+            
+            // Update obstacle positions for scrolling
+            obstacles.forEach(obstacle => {
+                const currentTop = parseFloat(obstacle.style.top);
+                obstacle.style.top = `${currentTop - scrollAmount * 0.1}px`;
+                
+                // Remove obstacles that are off screen
+                if (currentTop < -200) {
+                    obstacle.remove();
+                    obstacles.splice(obstacles.indexOf(obstacle), 1);
+                }
+            });
+        }
+    }
+
+    function updateBullets() {
+        // Update player bullets
+        for (let i = playerBullets.length - 1; i >= 0; i--) {
+            const bullet = playerBullets[i];
+            bullet.y -= bulletSpeed;
+            
+            // Remove bullets that are off screen or too old
+            if (bullet.y < -50 || bullet.y > window.innerHeight + 50) {
+                bullet.element.remove();
+                playerBullets.splice(i, 1);
+            } else {
+                bullet.element.style.top = `${bullet.y}px`;
+            }
+        }
+
+        // Update enemy bullets
+        for (let i = enemyBullets.length - 1; i >= 0; i--) {
+            const bullet = enemyBullets[i];
+            bullet.y += bulletSpeed;
+            
+            // Remove bullets that are off screen or too old
+            if (bullet.y > window.innerHeight + 50 || bullet.y < -50) {
+                bullet.element.remove();
+                enemyBullets.splice(i, 1);
+            } else {
+                bullet.element.style.top = `${bullet.y}px`;
+            }
+        }
+    }
+
+    function checkWaveProgress() {
+        // Check if all enemies in current wave are defeated
+        const aliveEnemies = enemies.filter((enemy, index) => 
+            enemyPositions[index] && enemyPositions[index].health > 0
+        );
+        
+        if (aliveEnemies.length === 0 && !waveCleared) {
+            // All enemies defeated, mark wave as cleared
+            waveCleared = true;
+            lastWaveClearTime = performance.now();
+            currentScore += 100; // Bonus for clearing wave
+            updateScoreDisplay();
+            console.log(`Wave ${currentEnemyWave + 1} cleared! Next wave in ${nextWaveDelay/1000} seconds.`);
+        }
+        
+        // Check if it's time to spawn the next wave
+        if (waveCleared && performance.now() - lastWaveClearTime > nextWaveDelay) {
+            currentEnemyWave++;
+            if (currentEnemyWave < enemySpawnPoints.length) {
+                spawnEnemyWave(currentEnemyWave);
+                waveCleared = false; // Reset flag for new wave
+                console.log(`Wave ${currentEnemyWave + 1} spawned!`);
+            } else {
+                // All waves cleared
+                showGameOver('勝利！全ての敵を倒しました！');
+            }
+        }
+    }
+
     // --- Event Listeners ---
-    // Touch controls
-    touchMovementArea.addEventListener('touchstart', (e) => {
+    // Global touch/click controls for movement and shooting
+    gameContainer.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        isTouching = true;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        touchCurrentX = touchStartX;
-        touchCurrentY = touchStartY;
+        playerTargetX = e.touches[0].clientX;
+        playerTargetY = e.touches[0].clientY;
+        playerShoot();
     });
 
-    touchMovementArea.addEventListener('touchmove', (e) => {
+    gameContainer.addEventListener('touchmove', (e) => {
         e.preventDefault();
-        if (isTouching) {
-            touchCurrentX = e.touches[0].clientX;
-            touchCurrentY = e.touches[0].clientY;
+        playerTargetX = e.touches[0].clientX;
+        playerTargetY = e.touches[0].clientY;
+    });
 
-            const deltaX = touchCurrentX - touchStartX;
-            const deltaY = touchCurrentY - touchStartY;
+    gameContainer.addEventListener('touchend', () => {
+        // When touch ends, set target to current position to stop movement
+        playerTargetX = playerX;
+        playerTargetY = playerY;
+    });
 
-            // Calculate target position based on touch delta, scaled by player speed
-            targetX = playerX + deltaX * 0.5; // Adjust multiplier for sensitivity
-            targetY = playerY + deltaY * 0.5; // Adjust multiplier for sensitivity
+    gameContainer.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        playerTargetX = e.clientX;
+        playerTargetY = e.clientY;
+        playerShoot();
+    });
 
-            // Clamp target position within screen bounds
-            const playerWidth = player.offsetWidth;
-            const playerHeight = player.offsetHeight;
-            targetX = Math.max(playerWidth / 2, Math.min(window.innerWidth - playerWidth / 2, targetX));
-            targetY = Math.max(playerHeight / 2, Math.min(window.innerHeight - playerHeight / 2, targetY));
+    gameContainer.addEventListener('mousemove', (e) => {
+        if (e.buttons === 1) { // Only move if left mouse button is pressed
+            playerTargetX = e.clientX;
+            playerTargetY = e.clientY;
         }
     });
 
-    touchMovementArea.addEventListener('touchend', () => {
-        isTouching = false;
-        // When touch ends, player should stop moving towards the last touch point
-        // Or, if we want it to stop immediately, set targetX/Y to current playerX/Y
-        targetX = playerX;
-        targetY = playerY;
+    gameContainer.addEventListener('mouseup', () => {
+        // When mouse button is released, set target to current position to stop movement
+        playerTargetX = playerX;
+        playerTargetY = playerY;
     });
-
-    touchShootBtn.addEventListener('touchstart', (e) => { e.preventDefault(); playerShoot(); });
 
     // Keyboard controls for desktop
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') targetX = playerX - 100; // Move target left
-        if (e.key === 'ArrowRight') targetX = playerX + 100; // Move target right
-        if (e.key === 'ArrowUp') targetY = playerY - 100; // Move target up
-        if (e.key === 'ArrowDown') targetY = playerY + 100; // Move target down
+        if (e.key === 'ArrowLeft') moveLeft = true;
+        if (e.key === 'ArrowRight') moveRight = true;
+        if (e.key === 'ArrowUp') moveUp = true;
+        if (e.key === 'ArrowDown') moveDown = true;
         if (e.key === ' ') playerShoot();
     });
     window.addEventListener('keyup', (e) => {
-        // For keyboard, we might want to stop movement when key is released
-        // Or, if we want continuous movement, we'd use moveLeft/Right/Up/Down flags
-        // For now, let's make it stop when key is released for simplicity with targetX/Y
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') targetX = playerX;
-        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') targetY = playerY;
+        if (e.key === 'ArrowLeft') moveLeft = false;
+        if (e.key === 'ArrowRight') moveRight = false;
+        if (e.key === 'ArrowUp') moveUp = false;
+        if (e.key === 'ArrowDown') moveDown = false;
     });
 
     // BGM Control
@@ -995,3 +1280,4 @@
 </script>
 </body>
 </html>
+
